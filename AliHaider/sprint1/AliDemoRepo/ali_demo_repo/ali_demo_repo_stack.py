@@ -3,12 +3,14 @@ from aws_cdk import (
     # aws_sqs as sqs,
     aws_events as events_,
     aws_events_targets as targets_,
-    core,
     aws_lambda as lambda_,
-    aws_iam
-    
+    aws_iam,
+    aws_cloudwatch as cloudwatch_,
+    aws_sns as sns_,
+    aws_sns_subscriptions as subscriptions_,
+    aws_cloudwatch_actions as actions_
 )
-
+from resources import constants
 # For consistency with other languages, `cdk` is the preferred import name for
 # the CDK's core module.  The following line also imports it as `core` for use
 # with examples from the CDK Developer's Guide, which are in the process of
@@ -27,6 +29,48 @@ class AliDemoRepoStack(cdk.Stack):
         priodic_event= events_.Schedule.rate(cdk.Duration.minutes(1))
         priodic_event_target= targets_.LambdaFunction(handler=preiodic_lambda_handler)
         priodic_event_rule= events_.Rule(self,"PriodicWebMonitoringRule",enabled=True,schedule=priodic_event,targets=[priodic_event_target])
+        
+        ################Sns service for Messages#############
+        topic=sns_.Topic(self, "WebHealthTopic")
+        topic.add_subscription(subscriptions_.EmailSubscription('ali.haider.s@skipq.org'))
+        
+        ################availability########################
+        #define dimension map to exttact from Cloudwatch
+        dimension={'URL':constants.UrlToMonitor}
+        #first extract the cloud watch metric data: for that we have cloudwatch.metric class with 
+        availability_metric=cloudwatch_.Metric(namespace=constants.MetricNameSpace,
+            metric_name=constants.UrlMonitorNameAvailability,
+            dimensions_map=dimension,
+            period=cdk.Duration.minutes(1),
+            label='Availability_Metric')
+        #setup Alarm_availability:
+        availability_Alarm=cloudwatch_.Alarm(self,id='AvailabilityAlarm',
+            metric=availability_metric,
+            comparison_operator=cloudwatch_.ComparisonOperator.LESS_THAN_THRESHOLD,
+            datapoints_to_alarm=1,
+            evaluation_periods=1,
+            threshold=1)
+        #######################latency####################
+        #define dimension map to exttact from Cloudwatch
+        dimension={'URL':constants.UrlToMonitor}
+        #first extract the cloud watch metric data: for that we have cloudwatch.metric class with 
+        latency_metric=cloudwatch_.Metric(namespace=constants.MetricNameSpace,
+            metric_name=constants.UrlMonitorNameLatency,
+            dimensions_map=dimension,
+            period=cdk.Duration.minutes(1),
+            label='Latency_Metric')
+        #setup Alarm_availability:
+        latency_Alarm=cloudwatch_.Alarm(self,id='LatencyAlarm',
+            metric=latency_metric,
+            comparison_operator=cloudwatch_.ComparisonOperator.GREATER_THAN_THRESHOLD,
+            datapoints_to_alarm=1,
+            evaluation_periods=1,
+            threshold=0.3)
+        #####################################################
+        availability_Alarm.add_alarm_action(actions_.SnsAction(topic))
+        latency_Alarm.add_alarm_action(actions_.SnsAction(topic))
+        
+            
         #lambda_role = self.Create_lambda_role()
         #hwhandler = self.create_lambda('hwlambdahandler' , './resources' , 'hwlambda.lambda_hwhandler' , lambda_role)
         
