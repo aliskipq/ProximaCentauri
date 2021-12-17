@@ -23,17 +23,21 @@ class AliDemoRepoStack(cdk.Stack):
         # The code that defines your stack goes here
         
         
-        lambda_role = self.Create_lambda_role()
+        lambda_role_dynamoDb = self.Create_lambda_role()
         
         preiodic_lambda_handler= self.create_lambda('PreiodicLambda' , './resources' , 'PreiodicLambda.PeriodicLambdaHandler',lambda_role)
+        preiodic_lambda_handler= self.create_lambda('DynamoDBLambda' , './resources' , 'dynamodblambda.dynamo_db_handler',lambda_role_dynamoDb)
         priodic_event= events_.Schedule.rate(cdk.Duration.minutes(1))
         priodic_event_target= targets_.LambdaFunction(handler=preiodic_lambda_handler)
         priodic_event_rule= events_.Rule(self,"PriodicWebMonitoringRule",enabled=True,schedule=priodic_event,targets=[priodic_event_target])
+        ######################Dynamodb lambda function###############################
+        #create our table in dynamoDB
+        dynamotable=self.create_table()
         
         ################Sns service for Messages#############
         topic=sns_.Topic(self, "WebHealthTopic")
         topic.add_subscription(subscriptions_.EmailSubscription('ali.haider.s@skipq.org'))
-        
+        topic.add_subscription(subscriptions_.LambdaSubscription())
         ################availability########################
         #define dimension map to exttact from Cloudwatch
         dimension={'URL':constants.UrlToMonitor}
@@ -109,5 +113,7 @@ class AliDemoRepoStack(cdk.Stack):
         handler=handler,
         runtime=lambda_.Runtime.PYTHON_3_6,
         role=role)
+        
+    def create_table(self):
         
         
