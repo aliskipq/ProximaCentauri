@@ -1,5 +1,0 @@
-UrlToMonitor= "www.skipq.org"
-UrlMonitorNameSpace="Ali_WebHealth"
-UrlMonitorNameAvailability= "Url_Availability"
-UrlMonitorNameLatency= "Url_Latency"
-MetricNameSpace="AliSkipQMatric"
