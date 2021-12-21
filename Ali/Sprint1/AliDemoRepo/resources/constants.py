@@ -5,4 +5,5 @@ UrlMonitorNameAvailability= "Url_Availability"
 UrlMonitorNameLatency= "Url_Latency"
 # MetricNameSpace="AliSkipQMatric"
 Urlnames=[]
+table="Ali_alarm_table"
 #s3_bucket.s3_bucket_get_data()

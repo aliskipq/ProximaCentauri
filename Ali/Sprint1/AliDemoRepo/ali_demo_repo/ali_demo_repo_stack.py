@@ -17,8 +17,7 @@ from aws_cdk import (
 )
 
 from resources import constants
-import boto3
-import ast
+
 
 # For consistency with other languages, `cdk` is the preferred import name for
 # the CDK's core module.  The following line also imports it as `core` for use
@@ -30,12 +29,23 @@ class AliDemotempStack(cdk.Stack):
     def __init__(self, scope: cdk.Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         # The code that defines your stack goes here
+        # dyno_lambda_role=self.Create_lambda_role()
+        #try making DataBase:
+        
+        try:
+            DB_= self.Create_data_base()
+        except: pass
+        
         #Create Lambda Role:
         lambda_role = self.Create_lambda_role()
-        # dyno_lambda_role=self.Create_lambda_role()
+        
         #create Lambdas:
         preiodic_lambda_handler= self.create_lambda('Cloudwatchputlambda' , './resources' , 'PreiodicLambda.Periodic_Lambda_Handler',lambda_role)
-        DynamoDB_Lambda_handler= self.create_lambda('Dynamoputdatalambda' , './resources' , 'DynamoLambda.lambda_database_function',lambda_role)
+        Database_Lambda =self.create_lambda('DataBaseLambda' , './resources' , 'databaselamda.database',lambda_role )
+        
+        DB_.grant_read_write_data(Database_Lambda)    
+        
+        # DynamoDB_Lambda_handler= self.create_lambda('Dynamoputdatalambda' , './resources' , 'DynamoLambda.lambda_database_function',lambda_role)
         #creation of Psuedo Event:
         priodic_event= events_.Schedule.rate(cdk.Duration.minutes(1))
         priodic_event_target= targets_.LambdaFunction(handler=preiodic_lambda_handler)
@@ -45,7 +55,9 @@ class AliDemotempStack(cdk.Stack):
         #create Topic:
         topic=sns_.Topic(self, "TopicDynamo")
         topic.add_subscription(subscriptions_.EmailSubscription('ali.haider.s@skipq.org'))
-        topic.add_subscription(subscriptions_.LambdaSubscription(fn=DynamoDB_Lambda_handler))
+        topic.add_subscription(subscriptions_.LambdaSubscription(fn=Database_Lambda))
+        
+        
         
        
        ######why doesnt it let me create #######
@@ -93,10 +105,14 @@ class AliDemotempStack(cdk.Stack):
     
     
     
-    
-    
-    
     #Functions For Use:
+    def Create_data_base(self):
+        table = db_.Table(self, constants.table,
+        partition_key=db_.Attribute(name="Timestamp", type=db_.AttributeType.STRING),
+        sort_key=db_.Attribute(name="sns_message", type=db_.AttributeType.STRING),
+        billing_mode=db_.BillingMode.PAY_PER_REQUEST
+        )
+        return table
     
     def setup_Availability_alarms_(self):
         
@@ -117,7 +133,6 @@ class AliDemotempStack(cdk.Stack):
         return  availability_Alarm
     
     def setup_Latency_alarms_(self):
-        
 
         dimension={'URL':self.Urltomonitor_}
         latency_metric=cloudwatch_.Metric(namespace=constants.UrlMonitorNameSpace,
@@ -131,7 +146,7 @@ class AliDemotempStack(cdk.Stack):
             comparison_operator=cloudwatch_.ComparisonOperator.GREATER_THAN_THRESHOLD,
             datapoints_to_alarm=1,
             evaluation_periods=1,
-            threshold=0.3)
+            threshold=0.52)
         
         return  latency_Alarm
         

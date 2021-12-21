@@ -4,8 +4,8 @@ import constants
 
 def s3_bucket_get_data():
     #initialize variables:
-    access_key_id='AKIAUTEXLE6CPTABHY7W'
-    secret_key='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'
+    access_key_id=''
+    secret_key=''
     region='us-east-2'
     bucket_name='tempbucket1'
     bucket_file_name='URLS.JSON'
