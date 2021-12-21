@@ -10,7 +10,7 @@ Infrastructure as code has quickly become a go-to process to automatically provi
 
 The AWS CDK, an open source software development framework to define cloud infrastructure, addresses these weaknesses. The AWS CDK supports popular programming languages, which developers can use to build, automate and manage infrastructure based on an imperative approach. Finally, developers can provision these commands through CloudFormation.
 
-## Project Functional Requirements [![Generic badge](https://img.shields.io/badge/Implemented-Yes-<COLOR>.svg)](https://github.com/saira2021skipq/hello_lambda)
+## Project Functional Requirements [![Generic badge](https://img.shields.io/badge/Implemented-Yes-<COLOR>.svg)]
 * Project is Available on Cloud9 Environment.
 * Project is implemented in python
 * Project displays WebHealth matrics on CloudWatch
