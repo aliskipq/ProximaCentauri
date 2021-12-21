@@ -42,7 +42,7 @@ class AliDemotempStack(cdk.Stack):
         #create Lambdas:
         preiodic_lambda_handler= self.create_lambda('Cloudwatchputlambda' , './resources' , 'PreiodicLambda.Periodic_Lambda_Handler',lambda_role)
         Database_Lambda =self.create_lambda('DataBaseLambda' , './resources' , 'databaselamda.database',lambda_role )
-        
+        # lambda funciton grand access:
         DB_.grant_read_write_data(Database_Lambda)    
         
         # DynamoDB_Lambda_handler= self.create_lambda('Dynamoputdatalambda' , './resources' , 'DynamoLambda.lambda_database_function',lambda_role)
