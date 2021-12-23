@@ -7,11 +7,11 @@ def Periodic_Lambda_Handler(events , context):
     
     results=[]
     ###why doesnt s3 bucket work:
-    # Urlnames=s3_bucket.s3_bucket_get_data()
-    # values=Urlnames.values()
+    Urlnames=s3_bucket.s3_bucket_get_data()
+    values=Urlnames.values()
     
     #values = ["www.youtube.com","www.flightradar24.com","www.pakistan.gov.pk","www.skipq.org"] 
-    values=['www.youtube.com']
+    # values=['www.youtube.com','www.flightradar24.com']
     
     for value in values:
         health=get_health(value)

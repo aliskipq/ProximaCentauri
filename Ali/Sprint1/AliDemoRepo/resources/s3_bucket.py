@@ -4,13 +4,13 @@ import constants
 
 def s3_bucket_get_data():
     #initialize variables:
-<<<<<<< HEAD
-=======
+# <<<<<<< HEAD
+# =======
     # add Your own access keys to access the s3 Bucket:
     #generate keys in iAm User and Copy paste that keys here:
->>>>>>> 576a8470aea4c8f03c5cb0761dc717856aaf3469
-    access_key_id=''
-    secret_key=''
+# >>>>>>> 576a8470aea4c8f03c5cb0761dc717856aaf3469
+    access_key_id='AKIAUTEXLE6CPTABHY7W'
+    secret_key='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'
     region='us-east-2'
     bucket_name='tempbucket1'
     bucket_file_name='URLS.JSON'
@@ -23,7 +23,9 @@ def s3_bucket_get_data():
     #list all Buckets:
     clientResponse = client.list_buckets()
     print(clientResponse['Buckets'])
+    
     names = []
+    
     # for bucket in clientResponse['Buckets']:
     obj = client.get_object(
     Bucket = bucket_name,

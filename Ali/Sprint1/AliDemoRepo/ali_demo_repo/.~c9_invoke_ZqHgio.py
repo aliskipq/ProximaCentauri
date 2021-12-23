@@ -11,13 +11,14 @@ from aws_cdk import (
     aws_dynamodb as db_,
     aws_sqs as sqs_,
     aws_events_targets as event_targets_,
-    aws_s3 as s3_
     # aws_lambda_event_sources as event_source,
 
     # aws_lambda_event_sources import SnsEventSource    
 )
 
 from resources import constants
+
+
 # For consistency with other languages, `cdk` is the preferred import name for
 # the CDK's core module.  The following line also imports it as `core` for use
 # with examples from the CDK Developer's Guide, which are in the process of
@@ -30,10 +31,10 @@ class AliDemotempStack(cdk.Stack):
         # The code that defines your stack goes here
         # dyno_lambda_role=self.Create_lambda_role()
         #try making DataBase:
+        
         try:
             DB_= self.Create_data_base()
-        except: 
-            DB_=db_.Table.from_table_arn(self, id='Ali_alarm_table' , table_arn='arn:aws:dynamodb:us-east-2:315997497220:table/Ali_alarm_table')#db_.Table.table_arn)
+        except: pass
         
         #Create Lambda Role:
         lambda_role = self.Create_lambda_role()
@@ -90,11 +91,10 @@ class AliDemotempStack(cdk.Stack):
         
         # DynamoDBRule = events_.Rule(self , ) 
         
-        # bucket=s3_.Bucket.from_bucket_name(self, "Bucket", "tempbucket1")
-        # print(bucket.s3_url_for_object('URLS.JSON'))           
+        
         
         # values = ["www.youtube.com","www.flightradar24.com","www.pakistan.gov.pk","www.skipq.org"]
-        values=["www.youtube.com","www.flightradar24.com","www.pakistan.gov.pk","www.skipq.org"]
+        values=['www.youtube.com','www.flightradar24.com']
         for value in values:
             self.Urltomonitor_=value
             availability_Alarm=self.setup_Availability_alarms_()
@@ -107,8 +107,7 @@ class AliDemotempStack(cdk.Stack):
     
     #Functions For Use:
     def Create_data_base(self):
-        table = db_.Table(self,'Ali_alarm_table',
-        table_Name = "Ali_alarm_table",
+        table = db_.Table(self, constants.table,
         partition_key=db_.Attribute(name="Timestamp", type=db_.AttributeType.STRING),
         sort_key=db_.Attribute(name="sns_message", type=db_.AttributeType.STRING),
         billing_mode=db_.BillingMode.PAY_PER_REQUEST
@@ -173,7 +172,6 @@ class AliDemotempStack(cdk.Stack):
         code=lambda_.Code.asset(asset),
         handler=handler,
         runtime=lambda_.Runtime.PYTHON_3_6,
-        role=role,
-        timeout=cdk.Duration.minutes(5))
+        role=role)
         
         
